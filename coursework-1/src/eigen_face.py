@@ -5,7 +5,7 @@ from face_data import FaceData
 
 
 def pca(matrix, data_count):
-    covariance_matrix_train = (matrix @ np.transpose(matrix)) / data_count
+    covariance_matrix_train = (matrix @ matrix.T) / data_count
     return np.linalg.eig(covariance_matrix_train)
 
 
@@ -19,7 +19,7 @@ class EigenFace:
         return pca(self._face_data.feature_train, self._face_data.data_count)
 
     def _compute_eig_n(self):
-        return pca(np.transpose(self._face_data.feature_train), self._face_data.data_count)
+        return pca(self._face_data.feature_train.T, self._face_data.data_count)
 
     @measure_time(measure_time_tag='Q1-a')
     def _compute_eig_d_with_measure_time(self):

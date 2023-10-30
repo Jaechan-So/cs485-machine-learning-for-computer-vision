@@ -16,10 +16,10 @@ class FaceData:
         self.data_count = self.face_data['X'].shape[1]
 
         self.feature_train, self.feature_test, self.label_train, self.label_test = [
-            np.transpose(x) for x in
+            x.T for x in
             train_test_split(
-                np.transpose(self.face_data['X']),
-                np.transpose(self.face_data['l']),
+                self.face_data['X'].T,
+                self.face_data['l'].T,
                 test_size=0.2,
                 random_state=config['train_test_split_seed']
             )
