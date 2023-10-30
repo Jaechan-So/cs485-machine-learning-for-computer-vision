@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 def get_root_dir():
-    return Path.cwd() / '..'
+    return Path.cwd() / 'coursework-1'
 
 
 def get_assets_dir():
