@@ -1,8 +1,8 @@
 import numpy as np
 
 from common.decorators import measure_time
-from face_data import FaceData, get_face_for_plot
-from face_plot import FacePlot, display
+from face_data import FaceData
+from face_plot import FacePlot, display, get_face_for_plot
 
 
 def pca(matrix, data_count):

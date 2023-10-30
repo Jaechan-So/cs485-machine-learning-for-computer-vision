@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
 
+from common.constants import context
+
+
+def get_face_for_plot(face):
+    return face.reshape(context['face_row'], context['face_column']).T
+
 
 def display():
     plt.show()

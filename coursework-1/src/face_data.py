@@ -1,13 +1,8 @@
-import numpy as np
 import scipy
 from sklearn.model_selection import train_test_split
 
 from common import utils
 from common.constants import context, config
-
-
-def get_face_for_plot(face):
-    return face.reshape(context['face_row'], context['face_column']).T
 
 
 class FaceData:
