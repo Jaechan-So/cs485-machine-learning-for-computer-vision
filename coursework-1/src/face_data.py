@@ -6,6 +6,10 @@ from common import utils
 from common.constants import context, config
 
 
+def get_face_for_plot(face):
+    return face.reshape(context['face_row'], context['face_column']).T
+
+
 class FaceData:
     def __init__(self):
         self.face_data = scipy.io.loadmat(utils.get_face_data_dir())
