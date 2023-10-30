@@ -4,6 +4,9 @@ from common.decorators import measure_time
 from face_data import FaceData
 from face_plot import FacePlot, display, reshape_face_for_plot
 
+reconstruction_choice_count = 3
+reconstruction_eigen_counts = [3, 10, 50, 100, 200]
+
 
 def pca(matrix, data_count):
     covariance_matrix_train = (matrix @ matrix.T) / data_count
@@ -67,7 +70,7 @@ class EigenFace:
         self._sort_eigen()
 
     def _reconstruct(self, face, num_of_eigen):
-        assert num_of_eigen <= len(num_of_eigen)
+        assert num_of_eigen <= len(self._eigen_value)
 
         reconstructed = self._mean_face
 
@@ -77,12 +80,30 @@ class EigenFace:
 
         return reconstructed
 
-    def reconstruct_and_display(self, faces, num_of_eigen):
+    def _reconstruct_and_plot_face(self, face, num_of_eigen):
+        reconstructed = self._reconstruct(face, num_of_eigen)
+        self._face_plot.add_plot(reshape_face_for_plot(reconstructed))
+        return reconstructed
+
+    def _reconstruct_and_display(self, faces, num_of_eigen):
         if self._face_plot is None:
             self._face_plot = FacePlot(len(faces))
 
-        for face in faces:
-            reconstructed = self._reconstruct(face, num_of_eigen)
-            self._face_plot.add_plot(reshape_face_for_plot(reconstructed))
+        reconstructed_faces = [self._reconstruct_and_plot_face(face, num_of_eigen) for face in faces]
 
         display()
+
+        return reconstructed_faces
+
+    def test_reconstruction(self):
+        feature_train_choice = np.random.choice(self._face_data.feature_train.T, reconstruction_choice_count)
+        feature_test_choice = np.random.choice(self._face_data.feature_test.T, reconstruction_choice_count)
+
+        train_reconstruction_results = [self._reconstruct_and_display(feature_train_choice, eigen_count) for eigen_count
+                                        in
+                                        reconstruction_eigen_counts]
+        test_reconstruction_results = [self._reconstruct_and_display(feature_test_choice, eigen_count) for eigen_count
+                                       in
+                                       reconstruction_eigen_counts]
+
+        return train_reconstruction_results, test_reconstruction_results
