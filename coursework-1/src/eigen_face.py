@@ -27,11 +27,11 @@ class EigenFace:
     def _compute_eig_n(self):
         return pca(self._face_data.feature_train.T, self._face_data.data_count)
 
-    @measure_time(measure_time_tag='Q1-a')
+    @measure_time(tag='Q1-a')
     def _compute_eig_d_with_measure_time(self):
         return self._compute_eig_d()
 
-    @measure_time(measure_time_tag='Q1-b')
+    @measure_time(tag='Q1-b')
     def _compute_eig_n_with_measure_time(self):
         return self._compute_eig_n()
 

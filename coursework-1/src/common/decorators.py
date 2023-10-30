@@ -1,12 +1,12 @@
 import time
 
-measure_time_tag_parameter_name = 'measure_time_tag'
+tag_parameter_name = 'tag'
 
 
 def measure_time(*args_decorator, **kwargs_decorator):
-    if measure_time_tag_parameter_name in kwargs_decorator and kwargs_decorator[
-        measure_time_tag_parameter_name] is not None:
-        tag = f"{kwargs_decorator[measure_time_tag_parameter_name]}"
+    if tag_parameter_name in kwargs_decorator and kwargs_decorator[
+        tag_parameter_name] is not None:
+        tag = f"{kwargs_decorator[tag_parameter_name]}"
     else:
         tag = ''
 
