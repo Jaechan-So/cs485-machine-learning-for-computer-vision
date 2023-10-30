@@ -2,7 +2,7 @@ import numpy as np
 
 from common.decorators import measure_time
 from face_data import FaceData
-from face_plot import FacePlot, display, get_face_for_plot
+from face_plot import FacePlot, display, reshape_face_for_plot
 
 
 def pca(matrix, data_count):
@@ -83,6 +83,6 @@ class EigenFace:
 
         for face in faces:
             reconstructed = self._reconstruct(face, num_of_eigen)
-            self._face_plot.add_plot(get_face_for_plot(reconstructed))
+            self._face_plot.add_plot(reshape_face_for_plot(reconstructed))
 
         display()
