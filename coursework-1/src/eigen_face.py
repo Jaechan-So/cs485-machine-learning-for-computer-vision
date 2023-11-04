@@ -16,11 +16,11 @@ class EigenFace:
     def __init__(self, face_data: FaceData):
         self._face_data = face_data
 
-    @measure_time(tag='Q1-a')
+    @measure_time(tag='Q1 - Eigenfaces - a')
     def _compute_eig_d_with_measure_time(self):
         return self._face_data.compute_eig_d()
 
-    @measure_time(tag='Q1-b')
+    @measure_time(tag='Q1 - Eigenfaces - b')
     def _compute_eig_n_with_measure_time(self):
         return self._face_data.compute_eig_n()
 
