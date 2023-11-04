@@ -55,7 +55,7 @@ class EigenSpaceClassFaceRecognition:
                            (class_num, eigen_space) in
                            self._class_to_eigen_space.items()]
         reconstructed_errors = np.array([
-            norm(face, projected_face)
+            norm(face - projected_face)
             for (_, projected_face) in projected_faces
         ])
         min_error_index = np.argmin(reconstructed_errors)

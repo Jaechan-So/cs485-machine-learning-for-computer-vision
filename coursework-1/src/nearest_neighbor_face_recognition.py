@@ -27,7 +27,7 @@ class NearestNeighborFaceRecognition:
         projection_of_face = self._compute_projection_of_face(eigen_vectors, face)
         projection_of_features = self._projections[:, :eigen_vectors.shape[1]]
         norm_differences = np.array(
-            [norm(projection_of_face, projection_of_feature) for projection_of_feature in projection_of_features])
+            [norm(projection_of_face - projection_of_feature) for projection_of_feature in projection_of_features])
         nearest_neighbor_index = np.argmin(norm_differences)
         return self._face_data.label_train.T.reshape(-1)[nearest_neighbor_index]
 
@@ -47,5 +47,5 @@ class NearestNeighborFaceRecognition:
         evaluate_face_recognition_result(total_count, predictions, labels)
 
     def test_nearest_neighbor_recognition(self):
-        for (num_of_eigen, norm_name, norm) in context['test_parameters']:
+        for (num_of_eigen, norm_name, norm) in context['pca_test_parameters']:
             self._compute_nearest_neighbors_and_evaluate_result(num_of_eigen, norm_name, norm)
