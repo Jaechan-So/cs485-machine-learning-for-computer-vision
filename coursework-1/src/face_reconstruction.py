@@ -62,5 +62,3 @@ class FaceReconstruction:
 
         self._reconstruct_and_display_faces(faces_train, 'Train face image samples')
         self._reconstruct_and_display_faces(faces_test, 'Test face image samples')
-
-        plt.show()
