@@ -105,3 +105,10 @@ def get_lda_eigen(features, labels):
 
 def get_eigen_projections(features, mean, num_of_eigen, eigen_vectors):
     return (features - mean) @ eigen_vectors.T[:, :num_of_eigen]
+
+
+def get_nearest_neighbor(projections_train, projections_test, labels_train, norm):
+    return [
+        labels_train[np.argmin(np.array([norm(diff) for diff in projection_test - projections_train]))]
+        for projection_test in projections_test
+    ]

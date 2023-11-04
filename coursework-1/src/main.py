@@ -5,6 +5,7 @@ from eigen_space_class_face_recognition import EigenSpaceClassFaceRecognition
 from face_data import FaceData
 from face_reconstruction import FaceReconstruction
 from nearest_neighbor_face_recognition import NearestNeighborFaceRecognition
+from pca_lda import PCALDA
 
 
 def main():
@@ -22,7 +23,11 @@ def main():
     # nearest_neighbor_face_recognition.test_nearest_neighbor_recognition()
 
     eigen_space_class_face_recognition = EigenSpaceClassFaceRecognition(face_data=face_data)
-    eigen_space_class_face_recognition.test_eigen_space_class_face_recognition()
+    # eigen_space_class_face_recognition.test_eigen_space_class_face_recognition()
+
+    # Q3 - LDA Ensemble for Face Recognition: PCA-LDA
+    pca_lda = PCALDA(face_data=face_data)
+    pca_lda.test_pca_lda()
 
     plt.show()
 
