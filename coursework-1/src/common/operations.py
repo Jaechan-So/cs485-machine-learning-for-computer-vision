@@ -34,3 +34,55 @@ def evaluate_face_recognition_result(total_count, predictions, labels):
     seaborn.heatmap(cm, annot=True, cmap='Blues')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
+
+
+def group_by_class(features, labels):
+    class_group = dict()
+
+    for index, feature in enumerate(features):
+        class_num = labels[index]
+
+        if class_num not in class_group:
+            class_group[class_num] = dict()
+            class_group[class_num]['features'] = []
+
+        class_group[class_num]['features'].append(feature)
+
+    for class_num, data in class_group.items():
+        class_group[class_num]['features'] = np.array(class_group[class_num]['features'])
+        class_group[class_num]['class_mean'] = np.mean(class_group[class_num]['features'], axis=0)
+        class_group[class_num]['total_count'] = class_group[class_num]['features'].shape[0]
+
+    return class_group
+
+
+def get_within_class_scatter_matrix(class_group, dimension):
+    scatter_matrix = np.zeros((dimension, dimension))
+
+    for _, data in class_group.items():
+        for feature in data['features']:
+            diff = (feature - data['class_mean']).reshape(-1, 1)
+            scatter_matrix += (diff @ diff.T)
+
+    return scatter_matrix
+
+
+def get_between_class_scatter_matrix(class_group, dimension, total_mean):
+    scatter_matrix = np.zeros((dimension, dimension))
+
+    for _, data in class_group.items():
+        diff = (data['class_mean'] - total_mean).reshape(-1, 1)
+        scatter_matrix += (data['total_count'] * (diff @ diff.T))
+
+    return scatter_matrix
+
+
+def lda(features, labels):
+    dimension = features.shape[1]
+    total_mean = np.mean(features, axis=0)
+    class_group = group_by_class(features, labels)
+
+    within_class_scatter_matrix = get_within_class_scatter_matrix(class_group, dimension)
+    between_class_scatter_matrix = get_between_class_scatter_matrix(class_group, dimension, total_mean)
+
+    return np.linalg.eig(np.linalg.inv(within_class_scatter_matrix) @ between_class_scatter_matrix)
