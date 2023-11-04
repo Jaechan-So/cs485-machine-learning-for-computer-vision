@@ -13,10 +13,7 @@ class NearestNeighborFaceRecognition:
     def _compute_projections(self):
         return np.array(
             [
-                [
-                    (face_train - self._face_data.mean_face).T @ eigen_vector
-                    for eigen_vector in self._face_data.eigen_vector
-                ]
+                ((face_train - self._face_data.mean_face).reshape(1, -1) @ self._face_data.eigen_vector.T).reshape(-1)
                 for face_train in self._face_data.feature_train.T
             ]
         )
@@ -26,12 +23,15 @@ class NearestNeighborFaceRecognition:
         self._projections = self._compute_projections()
 
     def _compute_projection_of_face(self, eigen_vectors, face):
-        return (face - self._face_data.mean_face).T @ eigen_vectors
+        return (face - self._face_data.mean_face).reshape(1, -1) @ eigen_vectors
 
     def _find_nearest_neighbor(self, eigen_vectors, norm, face):
-        nearest_neighbor_index = np.argmin(
-            norm(self._compute_projection_of_face(eigen_vectors, face) - self._projections))
-        return self._face_data.label_train[nearest_neighbor_index]
+        projection_of_face = self._compute_projection_of_face(eigen_vectors, face)
+        projection_of_features = self._projections[:, :eigen_vectors.shape[1]]
+        norm_differences = np.array(
+            [norm(projection_of_face, projection_of_feature) for projection_of_feature in projection_of_features])
+        nearest_neighbor_index = np.argmin(norm_differences)
+        return self._face_data.label_train.T.reshape(-1)[nearest_neighbor_index]
 
     def _evaluate_result(self, predictions, labels, num_of_eigen, norm_name):
         total_count = self._face_data.feature_test.T.shape[0]
@@ -53,10 +53,10 @@ class NearestNeighborFaceRecognition:
     def _compute_nearest_neighbors_and_evaluate_result(self, num_of_eigen, norm_name, norm):
         eigen_vectors = self._face_data.eigen_vector[:num_of_eigen].T
         predictions = self._compute_nearest_neighbors(eigen_vectors, norm)
-        labels = self._face_data.label_test
+        labels = self._face_data.label_test.reshape(-1)
 
         self._evaluate_result(predictions, labels, num_of_eigen, norm_name)
 
     def test_nearest_neighbor_recognition(self):
-        for (num_of_eigen, norm_name, norm) in context.test_parameters:
+        for (num_of_eigen, norm_name, norm) in context['test_parameters']:
             self._compute_nearest_neighbors_and_evaluate_result(num_of_eigen, norm_name, norm)
