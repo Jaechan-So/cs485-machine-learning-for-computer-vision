@@ -4,11 +4,7 @@ from sklearn.model_selection import train_test_split
 
 from common import utils
 from common.constants import context, config
-
-
-def pca(matrix, data_count):
-    covariance_matrix_train = (matrix @ matrix.T) / data_count
-    return np.linalg.eig(covariance_matrix_train)
+from common.operations import pca, low_dimension_pca, sort_eigen
 
 
 class FaceData:
@@ -33,26 +29,12 @@ class FaceData:
             )
         ]
 
-    def _compute_low_dimension_eigen(self):
-        low_dimension_matrix = self.feature_train if self.feature_train.shape[0] < self.feature_train.shape[
-            1] else self.feature_train.T
-        return pca(low_dimension_matrix, self.data_count)
-
-    def _sort_eigen(self, eigen_value, eigen_vector):
-        eigen = zip(eigen_value, eigen_vector)
-        sorted_eigen = sorted(eigen, key=lambda e: -e[0])
-
-        sorted_eigen_value = np.array([e[0] for e in sorted_eigen])
-        sorted_eigen_vector = np.array([e[1] for e in sorted_eigen])
-
-        return sorted_eigen_value, sorted_eigen_vector
-
     def _convert_low_dimension_eigen_vector_to_high_dimension_eigen_vector(self, eigen_vector):
         return (self.feature_train @ eigen_vector.reshape(-1, 1)).reshape(-1)
 
     def _preprocess_eigen(self):
-        eigen_value, eigen_vector = self._compute_low_dimension_eigen()
-        sorted_eigen_value, sorted_eigen_vector = self._sort_eigen(eigen_value, eigen_vector)
+        eigen_value, eigen_vector = low_dimension_pca(self.feature_train, self.data_count)
+        sorted_eigen_value, sorted_eigen_vector = sort_eigen(eigen_value, eigen_vector)
         high_dimension_eigen_vector = np.array(
             [self._convert_low_dimension_eigen_vector_to_high_dimension_eigen_vector(e) for e in sorted_eigen_vector])
         return sorted_eigen_value, high_dimension_eigen_vector

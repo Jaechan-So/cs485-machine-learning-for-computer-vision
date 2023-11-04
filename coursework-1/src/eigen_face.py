@@ -1,15 +1,8 @@
-import numpy as np
-
 from common.decorators import measure_time
 from face_data import FaceData
 
 reconstruction_choice_count = 3
 reconstruction_eigen_counts = [3, 10, 50, 100, 200]
-
-
-def pca(matrix, data_count):
-    covariance_matrix_train = (matrix @ matrix.T) / data_count
-    return np.linalg.eig(covariance_matrix_train)
 
 
 class EigenFace:
