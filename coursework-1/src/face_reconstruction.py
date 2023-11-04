@@ -20,7 +20,7 @@ class FaceReconstruction:
         reconstructed_face = np.copy(self._face_data.mean_face)
 
         for i in range(num_of_eigen):
-            target_eigen_vector = self._face_data.eigen_vector[i]
+            target_eigen_vector = self._face_data.eigen_vectors[i]
             a = (face - self._face_data.mean_face) @ target_eigen_vector
             reconstructed_face += a * target_eigen_vector
 

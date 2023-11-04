@@ -24,6 +24,14 @@ def sort_eigen(eigen_value, eigen_vector):
     return sorted_eigen_value, sorted_eigen_vector
 
 
+def get_pca_eigen(features, data_count):
+    eigen_values, eigen_vectors = low_dimension_pca(features, data_count)
+    eigen_vectors = eigen_vectors.T
+    sorted_eigen_values, sorted_eigen_vectors = sort_eigen(eigen_values, eigen_vectors)
+    high_dimension_eigen_vectors = (features @ sorted_eigen_vectors.T).T
+    return sorted_eigen_values, high_dimension_eigen_vectors
+
+
 def evaluate_face_recognition_result(total_count, predictions, labels):
     accuracy = np.count_nonzero(predictions == labels) / total_count
     print(f'Accuracy: {(accuracy * 100):.2f}%')
@@ -86,3 +94,14 @@ def lda(features, labels):
     between_class_scatter_matrix = get_between_class_scatter_matrix(class_group, dimension, total_mean)
 
     return np.linalg.eig(np.linalg.inv(within_class_scatter_matrix) @ between_class_scatter_matrix)
+
+
+def get_lda_eigen(features, labels):
+    eigen_values, eigen_vectors = lda(features, labels)
+    eigen_vectors = eigen_vectors.T
+    sorted_eigen_values, sorted_eigen_vectors = sort_eigen(eigen_values, eigen_vectors)
+    return sorted_eigen_values, sorted_eigen_vectors
+
+
+def get_eigen_projections(features, mean, num_of_eigen, eigen_vectors):
+    return (features - mean) @ eigen_vectors.T[:, :num_of_eigen]

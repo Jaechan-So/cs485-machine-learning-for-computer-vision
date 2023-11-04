@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 from common import utils
 from common.constants import context, config
-from common.operations import pca, low_dimension_pca, sort_eigen
+from common.operations import pca, get_pca_eigen
 
 
 class FaceData:
@@ -32,18 +32,11 @@ class FaceData:
     def _convert_low_dimension_eigen_vector_to_high_dimension_eigen_vector(self, eigen_vector):
         return (self.feature_train @ eigen_vector.reshape(-1, 1)).reshape(-1)
 
-    def _preprocess_eigen(self):
-        eigen_value, eigen_vector = low_dimension_pca(self.feature_train, self.data_count)
-        sorted_eigen_value, sorted_eigen_vector = sort_eigen(eigen_value, eigen_vector)
-        high_dimension_eigen_vector = np.array(
-            [self._convert_low_dimension_eigen_vector_to_high_dimension_eigen_vector(e) for e in sorted_eigen_vector])
-        return sorted_eigen_value, high_dimension_eigen_vector
-
     def __init__(self):
         self.face_data, self.data_count = self._load_face_data()
         self.feature_train, self.feature_test, self.label_train, self.label_test = self._split_faces_into_train_and_test()
         self.mean_face = np.mean(self.feature_train, axis=1)
-        self.eigen_value, self.eigen_vector = self._preprocess_eigen()
+        self.eigen_values, self.eigen_vectors = get_pca_eigen(self.feature_train, self.data_count)
 
     def compute_eig_d(self):
         return pca(self.feature_train, self.data_count)

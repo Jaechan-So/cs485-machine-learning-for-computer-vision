@@ -11,7 +11,7 @@ class NearestNeighborFaceRecognition:
     def _compute_projections(self):
         return np.array(
             [
-                ((face_train - self._face_data.mean_face).reshape(1, -1) @ self._face_data.eigen_vector.T).reshape(-1)
+                ((face_train - self._face_data.mean_face).reshape(1, -1) @ self._face_data.eigen_vectors.T).reshape(-1)
                 for face_train in self._face_data.feature_train.T
             ]
         )
@@ -39,7 +39,7 @@ class NearestNeighborFaceRecognition:
     @separate_logs
     def _compute_nearest_neighbors_and_evaluate_result(self, num_of_eigen, norm_name, norm):
         print(f'Compute nearest neighbors and evaluate results with # of eigenvectors: {num_of_eigen}, {norm_name}')
-        eigen_vectors = self._face_data.eigen_vector[:num_of_eigen].T
+        eigen_vectors = self._face_data.eigen_vectors[:num_of_eigen].T
         predictions = self._compute_nearest_neighbors_predictions(eigen_vectors, norm)
         labels = self._face_data.label_test.reshape(-1)
 
