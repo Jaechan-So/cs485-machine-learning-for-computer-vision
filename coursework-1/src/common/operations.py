@@ -93,6 +93,9 @@ def lda(features, labels):
     within_class_scatter_matrix = get_within_class_scatter_matrix(class_group, dimension)
     between_class_scatter_matrix = get_between_class_scatter_matrix(class_group, dimension, total_mean)
 
+    print(f'Rank of within-class scatter matrix: {np.linalg.matrix_rank(within_class_scatter_matrix)}')
+    print(f'Rank of between-class scatter matrix: {np.linalg.matrix_rank(between_class_scatter_matrix)}')
+
     return np.linalg.eig(np.linalg.inv(within_class_scatter_matrix) @ between_class_scatter_matrix)
 
 
