@@ -23,3 +23,17 @@ def measure_time(*args_decorator, **kwargs_decorator):
         return inner
 
     return wrapper
+
+
+separator = '-' * 40
+
+
+def separate_logs(fn):
+    def wrapper(*args, **kwargs):
+        print()
+        print(separator)
+        fn(*args, **kwargs)
+        print(separator)
+        print()
+
+    return wrapper
