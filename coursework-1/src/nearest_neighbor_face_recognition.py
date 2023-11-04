@@ -1,10 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-from sklearn.metrics import confusion_matrix
 
 from common.constants import context
-from common.decorators import measure_time
+from common.decorators import measure_time, separate_logs
+from common.operations import evaluate_face_recognition_result
 from face_data import FaceData
 
 
@@ -32,18 +30,6 @@ class NearestNeighborFaceRecognition:
             [norm(projection_of_face, projection_of_feature) for projection_of_feature in projection_of_features])
         nearest_neighbor_index = np.argmin(norm_differences)
         return self._face_data.label_train.T.reshape(-1)[nearest_neighbor_index]
-
-    def _evaluate_result(self, predictions, labels, num_of_eigen, norm_name):
-        total_count = self._face_data.feature_test.T.shape[0]
-        accuracy = np.count_nonzero(predictions == labels) / total_count
-        print(f'With {num_of_eigen} eigenvalues and {norm_name}, accuracy = {(accuracy * 100):.2f}%')
-
-        cm = confusion_matrix(labels, predictions)
-
-        plt.figure()
-        sns.heatmap(cm, annot=True, cmap='Blues')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
 
     @measure_time(tag='Q1 - Application of Eigenfaces - b: Computing Nearest Neighbors')
     def _compute_nearest_neighbors(self, eigen_vectors, norm):
