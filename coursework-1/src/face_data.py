@@ -29,9 +29,6 @@ class FaceData:
             )
         ]
 
-    def _convert_low_dimension_eigen_vector_to_high_dimension_eigen_vector(self, eigen_vector):
-        return (self.feature_train @ eigen_vector.reshape(-1, 1)).reshape(-1)
-
     def __init__(self):
         self.face_data, self.data_count = self._load_face_data()
         self.feature_train, self.feature_test, self.label_train, self.label_test = self._split_faces_into_train_and_test()
