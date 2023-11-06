@@ -27,7 +27,8 @@ def main():
 
     # Q3 - LDA Ensemble for Face Recognition: PCA-LDA
     pca_lda = PCALDA(face_data=face_data)
-    pca_lda.test_pca_lda()
+    # pca_lda.test_pca_lda()
+    # pca_lda.test_pca_lda_random_sampling_manipulate_training_data()
 
     plt.show()
 
