@@ -3,11 +3,12 @@ import numpy as np
 import seaborn
 from sklearn.metrics import confusion_matrix
 
-from common import constants
+from common.constants import context
+from common.utils import pipe
 
 
 def remove_zero_eigens(eigen_values, eigen_vectors):
-    valid_indices = np.where(eigen_values > constants.context['eigen_value_tolerance'])
+    valid_indices = np.where(eigen_values > context['eigen_value_tolerance'])
     return eigen_values[valid_indices], eigen_vectors[:, valid_indices].reshape(-1, valid_indices[0].shape[0])
 
 
@@ -31,15 +32,25 @@ def sort_eigen(eigen_value, eigen_vector):
     return sorted_eigen_value, sorted_eigen_vector
 
 
+def normalize_eigen_vectors(eigen_vectors):
+    return np.array([eigen_vector / context['norms']['L2 Norm'](eigen_vector) for eigen_vector in eigen_vectors])
+
+
+def preprocess_eigen(eigen_values, eigen_vectors):
+    return pipe(
+        remove_zero_eigens,
+        lambda eigen_values_inner, eigen_vectors_inner: (eigen_values_inner, eigen_vectors_inner.T),
+        sort_eigen,
+        lambda eigen_values_inner, eigen_vectors_inner: (
+            eigen_values_inner, normalize_eigen_vectors(eigen_vectors_inner)
+        ),
+    )(eigen_values, eigen_vectors)
+
+
 def get_pca_eigen(features, data_count):
     eigen_values, eigen_vectors = low_dimension_pca(features, data_count)
-    eigen_vectors = eigen_vectors.T
-    sorted_eigen_values, sorted_eigen_vectors = sort_eigen(eigen_values, eigen_vectors)
-    high_dimension_eigen_vectors = (features @ sorted_eigen_vectors.T).T
-    high_dimension_eigen_vectors = np.array(
-        [eigen_vector / constants.norms['L2 Norm'](eigen_vector) for eigen_vector in high_dimension_eigen_vectors]).T
-    pca_eigen_values, pca_eigen_vectors = remove_zero_eigens(sorted_eigen_values, high_dimension_eigen_vectors)
-    return pca_eigen_values, pca_eigen_vectors.T
+    high_dimension_eigen_vectors = features @ eigen_vectors
+    return preprocess_eigen(eigen_values, high_dimension_eigen_vectors)
 
 
 def evaluate_face_recognition_result(total_count, predictions, labels):
@@ -95,35 +106,27 @@ def get_between_class_scatter_matrix(class_group, dimension, total_mean):
     return scatter_matrix
 
 
-def lda(features, labels, m_pca):
-    dimension = features.shape[1]
+def lda(features, labels, pca_eigen_vectors):
+    total_count, dimension = features.shape
     total_mean = np.mean(features, axis=0)
     class_group = group_by_class(features, labels)
 
     within_class_scatter_matrix = get_within_class_scatter_matrix(class_group, dimension)
     between_class_scatter_matrix = get_between_class_scatter_matrix(class_group, dimension, total_mean)
 
-    total_scatter_matrix = within_class_scatter_matrix + between_class_scatter_matrix
-    total_scatter_matrix_eigen_values, total_scatter_matrix_eigen_vectors = np.linalg.eig(total_scatter_matrix)
-    _, sorted_total_scatter_matrix_eigen_vectors = sort_eigen(
-        total_scatter_matrix_eigen_values, total_scatter_matrix_eigen_vectors)
-    sorted_total_scatter_matrix_eigen_vectors = sorted_total_scatter_matrix_eigen_vectors[:m_pca].T
-
     print(f'Rank of within-class scatter matrix: {np.linalg.matrix_rank(within_class_scatter_matrix)}')
     print(f'Rank of between-class scatter matrix: {np.linalg.matrix_rank(between_class_scatter_matrix)}')
 
-    interpolated_within_class_scatter_matrix = sorted_total_scatter_matrix_eigen_vectors.T @ within_class_scatter_matrix @ sorted_total_scatter_matrix_eigen_vectors
-    interpolated_between_class_scatter_matrix = sorted_total_scatter_matrix_eigen_vectors.T @ between_class_scatter_matrix @ sorted_total_scatter_matrix_eigen_vectors
+    interpolated_within_class_scatter_matrix = pca_eigen_vectors.T @ within_class_scatter_matrix @ pca_eigen_vectors
+    interpolated_between_class_scatter_matrix = pca_eigen_vectors.T @ between_class_scatter_matrix @ pca_eigen_vectors
 
     return np.linalg.eig(
         np.linalg.inv(interpolated_within_class_scatter_matrix) @ interpolated_between_class_scatter_matrix)
 
 
-def get_lda_eigen(features, labels, m_pca):
-    eigen_values, eigen_vectors = lda(features, labels, m_pca)
-    eigen_vectors = eigen_vectors.T
-    sorted_eigen_values, sorted_eigen_vectors = sort_eigen(eigen_values, eigen_vectors)
-    return sorted_eigen_values, sorted_eigen_vectors
+def get_lda_eigen(features, labels, pca_eigen_vectors):
+    eigen_values, eigen_vectors = lda(features, labels, pca_eigen_vectors)
+    return preprocess_eigen(eigen_values, eigen_vectors)
 
 
 def get_eigen_projections(features, mean_face, eigen_vectors):
@@ -143,7 +146,7 @@ def get_nearest_neighbor(projections_train, projections_test, labels_train, norm
 
 
 def reshape_face_for_plot(face):
-    return face.reshape(constants.context['face_row'], constants.context['face_column']).T
+    return face.reshape(context['face_row'], context['face_column']).T
 
 
 def plot_example_success_and_failure_case_of_face_recognition(predictions, labels, feature_test, title):
