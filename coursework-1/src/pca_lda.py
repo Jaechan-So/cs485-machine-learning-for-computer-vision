@@ -3,7 +3,7 @@ import numpy as np
 from common.constants import context
 from common.decorators import separate_logs
 from common.operations import get_nearest_neighbor, \
-    evaluate_face_recognition_result, get_pca_eigen
+    evaluate_face_recognition_result, get_pca_eigen, plot_example_success_and_failure_case_of_face_recognition
 from face_data import FaceData
 from pca_lda_model import PCALDAModel
 
@@ -28,6 +28,9 @@ class PCALDA:
         labels = label_test
 
         evaluate_face_recognition_result(label_test.shape[0], predictions, labels)
+
+        plot_example_success_and_failure_case_of_face_recognition(predictions, labels, self._face_data.feature_test.T,
+                                                                  f'Face recognition with PCA-LDA-NN classification with M_pca = {m_pca}, M_lda = {m_lda}')
 
     def test_pca_lda(self):
         for m_pca, m_lda, norm_name, norm in context['pca_lda_test_parameters']:
