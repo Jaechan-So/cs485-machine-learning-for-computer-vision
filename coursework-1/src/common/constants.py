@@ -10,10 +10,10 @@ norms = {
 pca_test_parameters = [(eigen_count, name, norms[name]) for eigen_count, name in
                        list(itertools.product(eigen_counts, norms))]
 
-m_pca_candidates = [3, 10, 30, 100, 300]
+m_pca_candidates = [3, 10, 30, 100, 200]
 m_lda_candidates = [3, 5, 10, 30, 50]
 pca_lda_test_parameters = [(m_pca, m_lda, norm_name, norms[norm_name]) for m_pca, m_lda, norm_name in
-                           list(itertools.product(m_pca_candidates, m_lda_candidates, norms))]
+                           list(itertools.product(m_pca_candidates, m_lda_candidates, norms)) if m_pca > m_lda]
 
 context = {
     'face_row': 46,
