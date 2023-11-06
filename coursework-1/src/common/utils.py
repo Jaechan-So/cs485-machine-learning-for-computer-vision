@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from pathlib import Path
 
 
@@ -11,3 +12,18 @@ def get_assets_dir():
 
 def get_face_data_dir():
     return get_assets_dir() / 'face.mat'
+
+
+def pipe(*funcs):
+    def wrapper(*args, **kwargs):
+        result = funcs[0](*args, **kwargs)
+
+        for func in funcs[1:]:
+            if isinstance(result, Iterable):
+                result = func(*result)
+            else:
+                result = func(result)
+
+        return result
+
+    return wrapper
