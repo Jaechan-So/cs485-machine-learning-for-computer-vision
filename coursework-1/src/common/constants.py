@@ -18,6 +18,7 @@ pca_lda_test_parameters = [(m_pca, m_lda, norm_name, norms[norm_name]) for m_pca
 context = {
     'face_row': 46,
     'face_column': 56,
+    'eigen_value_tolerance': 1e-10,
     'eigen_counts': eigen_counts,
     'norms': norms,
     'pca_test_parameters': pca_test_parameters,
