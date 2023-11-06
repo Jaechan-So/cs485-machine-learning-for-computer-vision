@@ -1,4 +1,9 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+from common.constants import context
 from common.decorators import measure_time
+from common.operations import reshape_face_for_plot
 from face_data import FaceData
 
 reconstruction_choice_count = 3
@@ -18,10 +23,21 @@ class EigenFace:
         return self._face_data.compute_eig_n()
 
     def test_dimensionality(self):
-        eigen_value_d, _ = self._compute_eig_d_with_measure_time()
-        eigen_value_n, _ = self._compute_eig_n_with_measure_time()
+        plt.title('Mean face')
+        plt.imshow(reshape_face_for_plot(self._face_data.mean_face))
+
+        eigen_value_d, eigen_vector_d = self._compute_eig_d_with_measure_time()
+        valid_indicies = np.where(eigen_value_d > context['eigen_value_tolerance'])
+        valid_eigen_value_d = eigen_value_d[valid_indicies]
+        print(f'There are {valid_eigen_value_d.shape[0]} non-zero eigenvalues from the PCA with (1/N)A(A^T).')
+
+        eigen_value_n, eigen_vector_n = self._compute_eig_n_with_measure_time()
+        valid_indicies = np.where(eigen_value_n > context['eigen_value_tolerance'])
+        valid_eigen_value_n = eigen_value_n[valid_indicies]
+        print(f'There are {valid_eigen_value_n.shape[0]} non-zero eigenvalues from the PCA with (1/N)(A^T)A.')
+
         print('Therefore, using (1/N)(A^T)A is more efficient with respect to time and space.')
         print(
-            f'# of eigenvalues using (1/N)(A^T)A: {len(eigen_value_n)}, # of eigenvalues which are also in the set of eigenvalues using (1/N)A(A^T): {len([x in set(eigen_value_d) for x in eigen_value_n])}'
+            f'# of eigenvalues using (1/N)(A^T)A: {valid_eigen_value_n.shape[0]}, # of eigenvalues which are also in the set of eigenvalues using (1/N)A(A^T): {len([x in set(valid_eigen_value_d.T) for x in valid_eigen_value_n.T])}'
         )
         print('Hence, the set of eigenvalues from (1/N)(A^T)A is the subset of the set of eigenvalues from (1/N)A(A^T)')
