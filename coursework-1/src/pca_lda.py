@@ -3,7 +3,7 @@ import numpy as np
 from common.constants import context
 from common.decorators import separate_logs
 from common.operations import get_nearest_neighbor, \
-    evaluate_face_recognition_result, get_pca_eigen, plot_example_success_and_failure_case_of_face_recognition
+    evaluate_face_recognition_result, plot_example_success_and_failure_case_of_face_recognition
 from face_data import FaceData
 from pca_lda_model import PCALDAModel
 
@@ -21,7 +21,7 @@ class PCALDA:
                                                       mean_face, eigen_vectors, m_pca, m_lda, norm_name, norm):
         print(f'Compute PCA-LDA with M_pca: {m_pca}, M_lda: {m_lda}, {norm_name}')
 
-        model = PCALDAModel(feature_train, label_train, mean_face, eigen_vectors, m_pca, m_lda)
+        model = PCALDAModel(feature_train, eigen_vectors[:m_pca], feature_train, label_train, mean_face, m_lda)
         lda_projections_train, lda_projections_test = model.feed(feature_test)
 
         predictions = get_nearest_neighbor(lda_projections_train, lda_projections_test, label_train, norm)
@@ -63,7 +63,10 @@ class PCALDA:
             mean_face = np.mean(sampled_labels_train, axis=0)
             _, eigen_vectors = get_pca_eigen(sampled_features_train.T, bagging_count)
 
-            model = PCALDAModel(sampled_features_train, sampled_labels_train, mean_face, eigen_vectors, m_pca, m_lda)
+            model = PCALDAModel(self._face_data.feature_train.T, self._face_data.eigen_vectors[:m_pca],
+                                sampled_features_train,
+                                sampled_labels_train, self._face_data.mean_face,
+                                m_lda)
             models.append(model)
 
         return models
@@ -79,8 +82,9 @@ class PCALDA:
             sampled_eigen_vectors = self._face_data.eigen_vectors[indicies]
             total_eigen_vectors = np.concatenate((fixed_eigen_vectors, sampled_eigen_vectors), axis=0)
 
-            model = PCALDAModel(self._face_data.feature_train.T, self._face_data.label_train.reshape(-1),
-                                self._face_data.mean_face, total_eigen_vectors, m_0 + m_1, m_lda)
+            model = PCALDAModel(self._face_data.feature_train.T, total_eigen_vectors,
+                                self._face_data.feature_train.T, self._face_data.label_train.reshape(-1),
+                                self._face_data.mean_face, m_lda)
             models.append(model)
 
         return models
