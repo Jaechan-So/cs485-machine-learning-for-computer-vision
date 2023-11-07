@@ -125,24 +125,39 @@ class PCALDA:
         print('Test PCA-LDA with random sampling of training data')
 
         num_of_models = 20
-        bagging_counts = [10, 20, 50, 100, 200]
+        class_counts = [10, 25, 50]
         m_lda = 30
-        m_0 = 40
-        m_1 = 40
+        m_0 = 30
+        m_1 = 30
         m_pca = m_0 + m_1
 
         feature_space_models = self._get_models_from_pca_lda_with_feature_space_random_sampling(num_of_models, m_0, m_1,
                                                                                                 m_lda)
-        for bagging_count in bagging_counts:
-            training_data_models = self._get_models_from_pca_lda_with_bagging(num_of_models, bagging_count, m_pca,
+        for class_count in class_counts:
+            training_data_models = self._get_models_from_pca_lda_with_bagging(num_of_models, class_count, m_pca,
                                                                               m_lda)
             total_models = feature_space_models + training_data_models
-            print(f'Bagging training data, for {bagging_count} data')
+            print(f'Bagging training data, for {class_count} data')
             self._evaluate_ensembled_model(total_models)
 
     def test_pca_lda_random_sampling_manipulate_feature_space(self):
-        for m_pca, m_lda, norm_name, norm in context['pca_lda_test_parameters']:
-            self._compute_pca_lda_nearest_neighbor_recognition(m_pca, m_lda, norm_name, norm)
+        print('Test PCA-LDA with random sampling of feature space')
+
+        num_of_models = 20
+        class_count = 20
+        m_lda = 30
+        m_pca = 60
+        m_0_candidates = [3, 5, 10, 25, 50]
+        m_1_candidates = [m_pca - m for m in m_0_candidates]
+
+        bagging_models = self._get_models_from_pca_lda_with_bagging(num_of_models, class_count, m_pca, m_lda)
+
+        for m_0, m_1 in zip(m_0_candidates, m_1_candidates):
+            feature_space_models = self._get_models_from_pca_lda_with_feature_space_random_sampling(num_of_models, m_0,
+                                                                                                    m_1, m_lda)
+            total_models = bagging_models + feature_space_models
+            print(f'Random sampling for feature space, with m_0 = {m_0}, m_1 = {m_1}')
+            self._evaluate_ensembled_model(total_models)
 
     def test_pca_lda_random_sampling_manipulate_num_of_base_model(self):
         for m_pca, m_lda, norm_name, norm in context['pca_lda_test_parameters']:
