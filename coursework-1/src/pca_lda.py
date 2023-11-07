@@ -47,21 +47,21 @@ class PCALDA:
                 norm,
             )
 
-    def _random_sample_data(self, features, labels, data_count):
-        indicies = [index for index in range(features.shape[0])]
-        choices = np.random.choice(indicies, size=data_count)
-        return features[choices], labels[choices]
+    def _random_sample_class(self, class_count):
+        features_train = self._face_data.feature_train.T
+        labels_train = self._face_data.label_train.reshape(-1)
 
-    def _get_models_from_pca_lda_with_bagging(self, num_of_models, bagging_count, m_pca, m_lda):
+        class_nums = np.unique(labels_train)
+        class_choices = np.random.choice(class_nums, size=class_count, replace=False)
+        indices = [index for index in range(features_train.shape[0]) if labels_train[index] in class_choices]
+
+        return features_train[indices], labels_train[indices]
+
+    def _get_models_from_pca_lda_with_bagging(self, num_of_models, class_count, m_pca, m_lda):
         models = []
 
         for _ in range(num_of_models):
-            sampled_features_train, sampled_labels_train = self._random_sample_data(self._face_data.feature_train.T,
-                                                                                    self._face_data.label_train.reshape(
-                                                                                        -1),
-                                                                                    bagging_count)
-            mean_face = np.mean(sampled_labels_train, axis=0)
-            _, eigen_vectors = get_pca_eigen(sampled_features_train.T, bagging_count)
+            sampled_features_train, sampled_labels_train = self._random_sample_class(class_count)
 
             model = PCALDAModel(self._face_data.feature_train.T, self._face_data.eigen_vectors[:m_pca],
                                 sampled_features_train,
