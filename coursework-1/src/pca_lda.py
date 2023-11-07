@@ -77,9 +77,9 @@ class PCALDA:
         fixed_eigen_vectors = self._face_data.eigen_vectors[:m_0]
         eigen_count = self._face_data.eigen_vectors.shape[0]
         for _ in range(num_of_models):
-            indicies = np.random.choice(range(m_0, eigen_count), size=m_1, replace=False)
-            indicies.sort()
-            sampled_eigen_vectors = self._face_data.eigen_vectors[indicies]
+            indices = np.random.choice(range(m_0, eigen_count), size=m_1, replace=False)
+            indices.sort()
+            sampled_eigen_vectors = self._face_data.eigen_vectors[indices]
             total_eigen_vectors = np.concatenate((fixed_eigen_vectors, sampled_eigen_vectors), axis=0)
 
             model = PCALDAModel(self._face_data.feature_train.T, total_eigen_vectors,
@@ -115,7 +115,7 @@ class PCALDA:
 
         error_committee = np.count_nonzero(predictions != labels_test)
 
-        total_count = self._face_data.label_test.shape[0]
+        total_count = labels_test.shape[0]
         print(f'Error of the committee machine: {(error_committee / total_count) * 100:.2f}')
         print(f'Average error of indivdiual models: {(error_individual / total_count) * 100:.2f}')
 
