@@ -29,6 +29,8 @@ def main():
     pca_lda = PCALDA(face_data=face_data)
     # pca_lda.test_pca_lda()
     # pca_lda.test_pca_lda_random_sampling_manipulate_training_data()
+    # pca_lda.test_pca_lda_random_sampling_manipulate_feature_space()
+    pca_lda.test_pca_lda_random_sampling_manipulate_num_of_base_model()
 
     plt.show()
 

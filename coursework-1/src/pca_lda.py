@@ -116,8 +116,8 @@ class PCALDA:
         error_committee = np.count_nonzero(predictions != labels_test)
 
         total_count = labels_test.shape[0]
-        print(f'Error of the committee machine: {(error_committee / total_count) * 100:.2f}')
-        print(f'Average error of indivdiual models: {(error_individual / total_count) * 100:.2f}')
+        print(f'Error of the committee machine: {error_committee}')
+        print(f'Average error of indivdiual models: {error_individual}')
 
         evaluate_face_recognition_result(total_count, predictions, labels_test)
 
@@ -137,7 +137,7 @@ class PCALDA:
             training_data_models = self._get_models_from_pca_lda_with_bagging(num_of_models, class_count, m_pca,
                                                                               m_lda)
             total_models = feature_space_models + training_data_models
-            print(f'Bagging training data, for {class_count} data')
+            print(f'Bagging training data, for {class_count} classes')
             self._evaluate_ensembled_model(total_models)
 
     def test_pca_lda_random_sampling_manipulate_feature_space(self):
@@ -160,5 +160,19 @@ class PCALDA:
             self._evaluate_ensembled_model(total_models)
 
     def test_pca_lda_random_sampling_manipulate_num_of_base_model(self):
-        for m_pca, m_lda, norm_name, norm in context['pca_lda_test_parameters']:
-            self._compute_pca_lda_nearest_neighbor_recognition(m_pca, m_lda, norm_name, norm)
+        print('Test PCA-LDA with random sampling of the number of base models')
+
+        num_of_models_candidates = [3, 5, 10, 20, 40]
+        class_count = 20
+        m_lda = 30
+        m_0 = 30
+        m_1 = 30
+        m_pca = m_0 + m_1
+
+        for num_of_models in num_of_models_candidates:
+            bagging_models = self._get_models_from_pca_lda_with_bagging(num_of_models, class_count, m_pca, m_lda)
+            feature_space_models = self._get_models_from_pca_lda_with_feature_space_random_sampling(num_of_models, m_0,
+                                                                                                    m_1, m_lda)
+            total_models = bagging_models + feature_space_models
+            print(f'Randomization for the number of base models, with {num_of_models} models')
+            self._evaluate_ensembled_model(total_models)
