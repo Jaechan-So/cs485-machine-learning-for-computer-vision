@@ -48,6 +48,7 @@ def preprocess_eigen(eigen_values, eigen_vectors):
 
 
 def get_pca_eigen(features, data_count):
+    features = (features.T - np.mean(features.T, axis=0)).T
     eigen_values, eigen_vectors = low_dimension_pca(features, data_count)
     high_dimension_eigen_vectors = features @ eigen_vectors
     return preprocess_eigen(eigen_values, high_dimension_eigen_vectors)
