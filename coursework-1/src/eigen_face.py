@@ -3,7 +3,7 @@ import numpy as np
 
 from common.constants import context
 from common.decorators import measure_time
-from common.operations import reshape_face_for_plot
+from common.operations import reshape_face_for_plot, pca
 from face_data import FaceData
 
 reconstruction_choice_count = 3
@@ -16,11 +16,11 @@ class EigenFace:
 
     @measure_time(tag='Q1 - Eigenfaces - a')
     def _compute_eig_d_with_measure_time(self):
-        return self._face_data.compute_eig_d()
+        return pca(self._face_data.centered_feature_train, self._face_data.data_count)
 
     @measure_time(tag='Q1 - Eigenfaces - b')
     def _compute_eig_n_with_measure_time(self):
-        return self._face_data.compute_eig_n()
+        return pca(self._face_data.centered_feature_train.T, self._face_data.data_count)
 
     def test_dimensionality(self):
         plt.title('Mean face')

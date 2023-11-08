@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 from common import utils
 from common.constants import context, config
-from common.operations import pca, get_pca_eigen
+from common.operations import get_pca_eigen
 
 
 class FaceData:
@@ -14,9 +14,7 @@ class FaceData:
         assert context['face_row'] * context['face_column'] == face_data['X'].shape[0]
         assert face_data['X'].shape[1] == face_data['l'].shape[1]
 
-        data_count = face_data['X'].shape[1]
-
-        return face_data, data_count
+        return face_data
 
     def _split_faces_into_train_and_test(self):
         return [
@@ -30,13 +28,10 @@ class FaceData:
         ]
 
     def __init__(self):
-        self.face_data, self.data_count = self._load_face_data()
+        self.face_data = self._load_face_data()
         self.feature_train, self.feature_test, self.label_train, self.label_test = self._split_faces_into_train_and_test()
+        self.data_count = self.feature_train.T.shape[0]
         self.mean_face = np.mean(self.feature_train, axis=1)
+        self.centered_feature_train = (self.feature_train.T - self.mean_face).T
+        self.centered_feature_test = (self.feature_test.T - self.mean_face).T
         self.eigen_values, self.eigen_vectors = get_pca_eigen(self.feature_train, self.data_count)
-
-    def compute_eig_d(self):
-        return pca(self.feature_train, self.data_count)
-
-    def compute_eig_n(self):
-        return pca(self.feature_train.T, self.data_count)
