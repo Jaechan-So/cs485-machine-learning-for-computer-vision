@@ -49,7 +49,7 @@ class FaceReconstruction:
             theoretical_reconstruction_error = np.sum(self._face_data.eigen_values[eigen_count:])
 
             face_count = diff.shape[0]
-            experimental_reconstruction_error = np.sum(np.array([norms['L2 Norm'](d) for d in diff])) / face_count
+            experimental_reconstruction_error = np.sum(np.array([norms['L2 Norm'](d) ** 2 for d in diff])) / face_count
             print(
                 f'{title} with M = {eigen_count}: theoretical - {theoretical_reconstruction_error}, experimental: {experimental_reconstruction_error}')
 
