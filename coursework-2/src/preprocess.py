@@ -2,6 +2,7 @@ import random
 from pathlib import Path
 
 from PIL import Image
+from easydict import EasyDict as edict
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
@@ -36,21 +37,26 @@ def get_train_test_data():
     train_data = []
     test_data = []
     num_of_classes = 0
+    class_to_id = edict()
+    id_to_class = edict()
     for class_path in directory_path.iterdir():
-        num_of_classes += 1
+        class_to_id[class_path.name] = num_of_classes
+        id_to_class[str(num_of_classes)] = class_path.name
 
         selected_images = random.sample(
             [image_path for image_path in class_path.iterdir()],
             config.data_count.train + config.data_count.test,
         )
         train_data += [
-            (path, class_path.name)
+            (path, num_of_classes)
             for path in selected_images[: config.data_count.train]
         ]
         test_data += [
-            (path, class_path.name)
+            (path, num_of_classes)
             for path in selected_images[config.data_count.train :]
         ]
+
+        num_of_classes += 1
 
     transform = transforms.Compose(
         [
@@ -66,7 +72,13 @@ def get_train_test_data():
     train_loader = DataLoader(train_dataset, **dataloader_kwargs)
     test_loader = DataLoader(test_dataset, **dataloader_kwargs)
 
-    return train_dataset, test_dataset, train_loader, test_loader, num_of_classes
+    return (
+        train_loader,
+        test_loader,
+        num_of_classes,
+        class_to_id,
+        id_to_class,
+    )
 
 
 def preprocess():
