@@ -9,8 +9,6 @@ from torchvision import transforms
 from common.config import config
 from common.utils import get_caltech_101_dataset_dir
 
-dataloader_kwargs = {"batch_size": config.batch_size, "shuffle": True}
-
 
 class Caltech101ImageDataset(Dataset):
     def __init__(self, image_data, transform=None):
@@ -30,7 +28,7 @@ class Caltech101ImageDataset(Dataset):
         return image, label
 
 
-def get_train_test_data():
+def get_train_test_data(args):
     dataset_dir = get_caltech_101_dataset_dir()
     directory_path = Path(dataset_dir)
 
@@ -69,6 +67,7 @@ def get_train_test_data():
     train_dataset = Caltech101ImageDataset(train_data, transform)
     test_dataset = Caltech101ImageDataset(test_data, transform)
 
+    dataloader_kwargs = {"batch_size": args.batch_size, "shuffle": True}
     train_loader = DataLoader(train_dataset, **dataloader_kwargs)
     test_loader = DataLoader(test_dataset, **dataloader_kwargs)
 
@@ -81,6 +80,6 @@ def get_train_test_data():
     )
 
 
-def preprocess():
+def preprocess(args):
     random.seed(config.seed)
-    return get_train_test_data()
+    return get_train_test_data(args)
