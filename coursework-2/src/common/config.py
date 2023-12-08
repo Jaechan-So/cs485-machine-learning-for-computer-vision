@@ -12,6 +12,5 @@ config = edict(
         if torch.backends.mps.is_available()
         else "cpu",  # Device for PyTorch tensors.
         "epoch": 50,  # Epoch for training. [50]
-        "batch_size": 10,  # Batch size for Dataloader. [10]
     }
 )
