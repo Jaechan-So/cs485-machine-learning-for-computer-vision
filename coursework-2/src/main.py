@@ -12,18 +12,36 @@ from experiment import (
 
 def compare_experiment_number_of_layers():
     args1 = get_default_args()
-    args2 = get_default_args()
-    args2.conv_channels = [6, 10, 16, 25]
 
-    compare_experiment((args1, "Less layers"), (args2, "More Layers"))
+    args2 = get_default_args()
+    args2.conv_channels = [3, 6, 6]
+
+    args3 = get_default_args()
+    args3.conv_channels = [3, 3, 6, 6]
+
+    compare_experiment(
+        (args1, "2 Conv Layers"), (args2, "3 Conv Layers"), (args3, "4 Conv Layers")
+    )
 
 
 def compare_experiment_kernel_size():
     args1 = get_default_args()
-    args2 = get_default_args()
-    args2.kernel_size = 10
 
-    compare_experiment((args1, "Smaller kernel size"), (args2, "Bigger kernel size"))
+    args2 = get_default_args()
+    args2.kernel_size = 5
+
+    args3 = get_default_args()
+    args3.kernel_size = 10
+
+    args4 = get_default_args()
+    args4.kernel_size = 30
+
+    compare_experiment(
+        (args1, "Kernel size 3"),
+        (args2, "Kernel size 5"),
+        (args3, "Kernel size 10"),
+        (args4, "Kernel size 30"),
+    )
 
 
 def compare_experiment_skip_connections():
@@ -67,17 +85,17 @@ def compare_experiment_loss_function():
 
 def compare_experiment_learning_rates():
     args1 = get_default_args()
-    args1.learning_rate = 1e-1
+    args1.learning_rate = 1e-2
 
     args2 = get_default_args()
 
     args3 = get_default_args()
-    args3.learning_rate = 1e-5
+    args3.learning_rate = 1e-4
 
     compare_experiment(
-        (args1, "Learning rate 1e-1"),
+        (args1, "Learning rate 1e-2"),
         (args2, "Learning rate 1e-3"),
-        (args3, "Learning rate 1e-5"),
+        (args3, "Learning rate 1e-4"),
     )
 
 
@@ -90,10 +108,14 @@ def compare_experiment_batch_sizes():
     args3 = get_default_args()
     args3.batch_size = 30
 
+    args4 = get_default_args()
+    args4.batch_size = 50
+
     compare_experiment(
         (args1, "Batch size 5"),
         (args2, "Batch size 10"),
         (args3, "Batch size 30"),
+        (args4, "Batch size 50"),
     )
 
 
@@ -154,13 +176,16 @@ def model_experiment_compression():
 
 
 if __name__ == "__main__":
-    compare_experiment_number_of_layers()
+    # compare_experiment_number_of_layers()
     # compare_experiment_kernel_size()
+
+    # Residual Block 활성화 (이 실험만)
     # compare_experiment_skip_connections()
+
     # compare_experiment_dropout_regularization()
     # compare_experiment_loss_function()
     # compare_experiment_learning_rates()
     # compare_experiment_batch_sizes()
     # compare_experiment_pretrained_weights()
     # compare_experiment_normalization()
-    # model_experiment_compression()
+    model_experiment_compression()
