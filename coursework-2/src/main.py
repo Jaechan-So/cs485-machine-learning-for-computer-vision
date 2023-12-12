@@ -99,10 +99,10 @@ def compare_experiment_batch_sizes():
 
 def compare_experiment_pretrained_weights():
     args1 = get_default_args()
-    args1.model = "AlexNet"
+    args1.model = "ResNet50"
 
     args2 = get_default_args()
-    args2.model = "AlexNet"
+    args2.model = "ResNet50"
     args2.use_pretrained = True
 
     compare_experiment(
