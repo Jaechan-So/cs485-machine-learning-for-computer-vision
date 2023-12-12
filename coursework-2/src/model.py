@@ -15,6 +15,7 @@ class ResidualBlock(nn.Module):
                 stride=1,
                 padding=1,
             ),
+            nn.BatchNorm2d(in_channels),
             nn.ReLU(),
         )
 
@@ -53,6 +54,13 @@ class LeNet(nn.Module):
     ):
         super(LeNet, self).__init__()
 
+        self.residual_blocks = nn.ParameterList(
+            [
+                ResidualBlock(3, skip=skip),
+                ResidualBlock(3, skip=skip),
+            ]
+        )
+
         conv_channels = [3] + conv_channels
 
         feature_output_size = 224 + (3 - kernel_size) * (len(conv_channels) - 1) * 2
@@ -88,7 +96,6 @@ class LeNet(nn.Module):
             feature_block += [
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=kernel_size, stride=1, padding=1),
-                ResidualBlock(out_channels, skip=skip),
             ]
 
             feature_block = nn.Sequential(*feature_block)
@@ -105,6 +112,9 @@ class LeNet(nn.Module):
             ]
 
     def forward(self, x):
+        for block in self.residual_blocks:
+            x = block(x)
+
         for block in self.feature_blocks:
             x = block(x)
 
