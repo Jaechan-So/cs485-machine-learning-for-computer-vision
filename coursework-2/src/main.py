@@ -1,5 +1,7 @@
 import time
 
+from torch import onnx
+
 from experiment import (
     get_default_args,
     compare_experiment,
@@ -154,7 +156,7 @@ def compare_experiment_normalization():
 
 def model_experiment_compression():
     args = get_default_args()
-    (_, _, model), _, test_loader = run_experiment(args)
+    (_, _, model), _, test_loader = run_experiment(args, "Before compressed")
 
     start = time.time()
     accuracy = evaluate(model, test_loader)
@@ -165,6 +167,7 @@ def model_experiment_compression():
     )
 
     compress_model(model)
+    onnx.export(model, next(iter(test_loader))[0], f"After compressed.onnx")
 
     start = time.time()
     accuracy = evaluate(model, test_loader)
