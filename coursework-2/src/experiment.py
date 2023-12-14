@@ -3,7 +3,7 @@ import numpy as np
 import scipy
 import torch
 from easydict import EasyDict as edict
-from torch import nn, optim
+from torch import nn, optim, onnx
 from torchvision.models import (
     alexnet,
     AlexNet_Weights,
@@ -192,7 +192,7 @@ def train_model(
     return list(range(config.epoch)), accuracies, model
 
 
-def run_experiment(args):
+def run_experiment(args, title):
     (
         train_loader,
         test_loader,
@@ -203,6 +203,7 @@ def run_experiment(args):
     args.num_of_classes = num_of_classes
 
     model, criterion, optimizer = get_context(args)
+    onnx.export(model, next(iter(train_loader))[0], f"output_{title}.onnx")
     return (
         train_model(
             train_loader,
@@ -219,7 +220,7 @@ def run_experiment(args):
 def compare_experiment(*exps):
     for exp in exps:
         args, title = exp
-        (x, y, _), _, _ = run_experiment(args)
+        (x, y, _), _, _ = run_experiment(args, title)
         plt.plot(x, y, label=title)
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy (%)")
